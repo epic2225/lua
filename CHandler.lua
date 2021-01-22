@@ -25,8 +25,6 @@ Setup:
 
 ]]
 
-debug.profilebegin("CHandler")
-
 local CPS = {
     Settings = {
         FixturesEnabled = true; --Set to false to completely disable all fixture controllers
@@ -105,32 +103,7 @@ local CPS = {
                 Speed = 3; --Default: 3
             };
             
-            Pan1 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Pan2 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Pan3 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Pan4 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Pan5 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Pan6 = {
+            Zoom1 = {
                 Size = 45; --Default: 45
                 Speed = 3; --Default: 3
             };
@@ -146,18 +119,6 @@ local CPS = {
             Color3 = {
                 Speed = 3; --Default: 3
             };
-            
-            Color4 = {
-                Speed = 3; --Default: 3
-            };
-            
-            Color5 = {
-                Speed = 3; --Default: 3
-            };
-            
-            Color6 = {
-                Speed = 3; --Default: 3
-            };
         }
     };
 }
@@ -168,14 +129,6 @@ local debugMode = false
 
 local print = function(...) if (debugMode) then print(...) end end
 
-local CPS = setmetatable(CPS, {
-    __index = function(t, i)
-        warn("CPS: HandlerMaster index not found: "..i)
-    end;
-})
-
-local Fixtures = CPS.Fixtures
-
 local reverse = function(bool)
     return ({
         [true] = false;
@@ -183,12 +136,24 @@ local reverse = function(bool)
     })[bool]
 end
 
-function CPS:FindEffect(effectIndex)
-    return self.FX[effectIndex];
+function CPS:FindEffect(effectIndex, subIndex)
+    return self:FindEffect(effectIndex)[subIndex]
 end
 
 function CPS:UpdateEffect(effectIndex, bool)
     self.Effects[effectIndex].Disabled = reverse(bool);
+end
+
+function CPS:ChangeEffectSpeed(index1, index2, spd)
+    if (index1 == "All") and (spd == nil) then
+        for _, v in pairs(self.FX) do
+            for _, vv in pairs(v) do
+                vv.Speed = index2
+            end
+        end
+    else
+        self.FX[index1][index2].Speed = spd
+    end
 end
 
 function CPS:UpdateFixtures(attribute, value)
