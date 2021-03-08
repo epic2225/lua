@@ -156,26 +156,51 @@ function CPS:ChangeEffectSpeed(index1, index2, spd)
     end
 end
 
-function CPS:UpdateFixtures(attribute, value)
-    for i = 1, #self.Fixtures:GetChildren() do
-        for ii = 1, #self.Fixtures:GetChildren()[i]:GetChildren() do
-            self.Fixtures:GetChildren()[i]:GetChildren()[ii].Controller[attribute].Value = value
+function CPS:UpdateFixtures(group, attribute, value)
+    local split = function(s, x, y)
+        return s:sub(1, x), s:sub(y, s:len())
+    end
+    
+    if group == "All" then
+        local fixtures = self.Fixtures:GetChildren()
+        
+        for i = 1, #fixtures do
+            local fixtureGroup = fixtures[i]:GetChildren()
+            
+            for ii = 1, #fixtureGroup do
+                fixtureGroup[ii].Control[attribute].Value = value
+            end
+        end
+    else
+        local s1, s2 = split(group, 1, 2)
+        local groups = {p = group, s = s1 .. "R" .. s2}
+        
+        local gr1 = self.Fixtures[groups.p]:GetChildren()
+        local gr2 = self.Fixtures[groups.s]:GetChildren()
+        
+        for i = 1, #gr1 do
+            gr1[i].Control[attribute].Value = value
+        end
+        
+        for i = 1, #gr2 do
+            gr2[i].Control[attribute].Value = value
         end
     end
 end
 
-function CPS:GetFixtureAttributes()
-    local att = {}
+function CPS:GetFixtures()
+    local fixtures = {}
+    local f = self.Fixtures:GetChildren()
     
-    for i = 1, #self.Fixtures:GetChildren() do
-        for ii = 1, #self.Fixtures:GetChildren()[i]:GetChildren() do
-            local index = self.Fixtures:GetChildren()[i].Name
-            
-            att[index] = self.Fixtures:GetChildren()[i]:GetChildren()[ii].Controller
+    for i = 1, #f do
+        local group = self.Fixtures[i]:GetChildren()
+        
+        for ii = 1, #group do
+            fixtures[i + (#group * (i - 1))] = group[ii]
         end
     end
     
-    return att
+    return fixtures
 end
 
 debug.profileend("CHandler")
