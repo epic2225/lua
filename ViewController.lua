@@ -20,7 +20,9 @@ function viewController:initScreen(screen)
     local diff = 100
     
     function connections.new(func)
-        connections[#connections + 1] = func
+        if typeof(func) == "function" or "RBXScriptConnection" then
+            connections[#connections + 1] = func
+        end
     end
     
     connections.new(highlight.MouseButton1Down:Connect(function(x, y)
