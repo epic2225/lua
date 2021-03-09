@@ -2,10 +2,10 @@ return function(h, sat, val)
     local v = (h % 360)
 	
     local r, r2 = 0, 0
-	local g, g2 = 0, 0
-	local b, b2 = 0, 0
+    local g, g2 = 0, 0
+    local b, b2 = 0, 0
 	
-	if v <= 240 then r = 0
+    if v <= 240 then r = 0
     elseif v >= 300 then r = 1
     else r = ((v - 240) / 60) end
     if v <= 60 then r2 = 1
@@ -27,8 +27,8 @@ return function(h, sat, val)
     else b = 1 - ((v - 300) / 60) end
         
     local red = math.floor((r + r2) * 255)
-	local green = math.floor((g + g2) * 255) - 255
-	local blue = math.floor((b + b2) * 255) - 255
+    local green = math.floor((g + g2) * 255) - 255
+    local blue = math.floor((b + b2) * 255) - 255
     
     local function mix(s, v, r, g, b)
         local clamp = function(x, y, z) if x < y then return y elseif x > z then return z else return x end end
