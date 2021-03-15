@@ -1,4 +1,4 @@
-return function(h, sat, val)
+local rgb = function(h, sat, val)
     local v = (h % 360)
 	
     local r, r2 = 0, 0
@@ -54,3 +54,5 @@ return function(h, sat, val)
     
     return mix(sat, val, red, green, blue)
 end
+
+return rgb
