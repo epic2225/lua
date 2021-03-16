@@ -31,6 +31,7 @@ local CPS = {
         fixturesUpdating = true; --Set to false to stop updating the attributes of the fixtures
         effectsEnabled = true; --Set to false to stop any effect from being enabled and/or to disable all effects
         effectsUpdating = true; --Set to false to stop effects from updating to the fixtures
+        effectsRunning = false; --Set to true to run all effects on start
     };
     
     Fixtures = workspace.CLPakyScenius;
