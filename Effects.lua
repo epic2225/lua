@@ -5,6 +5,14 @@ local function call(func, ...)
     func(...)
 end
 
+local function copy(inTable, outTable)
+    local tbl = outTable
+    for k, v in pairs(inTable) do
+        tbl[k] = v
+    end
+    return tbl
+end
+
 local waveforms = {
     sin = function(x, phase)
         return (math.sin(x + rad(phase)) + 1) / 2
@@ -15,7 +23,8 @@ function effectEngine:runEffect(fixture, waveform, id, effect)
     if effects.running[id] then
         effects.running[id] = nil
     end
-    effects.running[id] = effect
+    
+    local newEffect = copy(effect, {connection = nil})
     
     local effectIndex = {
         ["CLPakyScenius"] = function()
@@ -32,7 +41,15 @@ function effectEngine:runEffect(fixture, waveform, id, effect)
         end,
     }
     
-    effectIndex[fixture]()
+    if effect.enabled then
+        local function loop() effectIndex[fixture]() end
+        
+        newEffect.connection = game:GetService("RunService").Stepped:Connect(loop)
+    end
+    
+    effects.running[id] = newEffect
+    
+    return newEffect
 end
 
 function effectEngine:init()
