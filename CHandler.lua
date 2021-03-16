@@ -158,7 +158,7 @@ function CPS:init()
 
     self.updaters["All"] = function(att, value)
         for _, v in pairs(self:GetFixtures()) do
-            v.Control[att.main].Value = util.clamp(value, att.min, att.max)
+            v.Control[att.main]:Fire(util.clamp(value, att.min, att.max))
         end
     end
     
@@ -170,11 +170,11 @@ function CPS:init()
                 local Value = clamp(value, att.min, att.max)
 
                 for _, v in pairs(self.Fixtures[GR1]:GetChildren()) do
-                    v.Control[attribute].Value = Value
+                    v.Control[attribute]:Fire(Value)
                 end
 
                 for _, v in pairs(self.Fixtures[GR2]:GetChildren()) do
-                    v.Control[attribute].Value = Value
+                    v.Control[attribute]:Fire(Value)
                 end
             end
         end
@@ -195,7 +195,7 @@ function CPS:init()
         end
     end
     
-    --init effects
+    --start effects
     
     for name, group in pairs(self.effects) do
         group.speed.value = util.clamp(group.speed.default, group.speed.min, group.speed.max)
@@ -209,14 +209,16 @@ function CPS:init()
                     if effect.enabled then
                         local run, pause, effects = effectRunner()
                         
-                        run("CLPakyScenius", name, effect)
+                        if effects.running[k] == effect then
+                            pause("CLPakyScenius", k, effect)
+                        end
                     end
                 else
                     if effect.enabled then
                         local run, pause, effects = effectRunner()
                         
                         if effects.running[k] == effect then
-                            pause(effect)
+                            pause("CLPakyScenius", k, effect)
                         end
                     end
                 end
