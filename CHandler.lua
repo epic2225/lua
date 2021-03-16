@@ -121,6 +121,17 @@ function CPS:UpdateFixtures(group, attribute, value)
 end
 
 function CPS:GetFixtures()
+    local groups = {}
+    local f = self.Fixtures:GetChildren()
+    
+    for k, v in pairs(f) do
+        groups[v.Name] = v
+    end
+    
+    return groups
+end
+
+function CPS:GetAllFixtures()
     local fixtures = {}
     local f = self.Fixtures:GetChildren()
     
