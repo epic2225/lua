@@ -26,9 +26,11 @@ Setup:
 ]]
 
 local CPS = {
-    Settings = {
-        FixturesEnabled = true; --Set to false to completely disable all fixture controllers
-        FixturesUpdating = true; --Set to false to stop updating the attributes of the fixtures
+    settings = {
+        fixturesEnabled = true; --Set to false to completely disable all fixture controllers
+        fixturesUpdating = true; --Set to false to stop updating the attributes of the fixtures
+        effectsEnabled = true; --Set to false to stop any effect from being enabled and/or to disable all effects
+        effectsUpdating = true; --Set to false to stop effects from updating to the fixtures
     };
     
     Fixtures = workspace.CLPakyScenius;
@@ -45,91 +47,37 @@ local CPS = {
         Speed = {default=127,min=0,max=255,main="Speed"},
     };
     
-    FX = {
-        Sine = {
-            Circle1 = {
-                SizeX = 45; --Default: 45
-                SizeY = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Circle2 = {
-                SizeX = 45; --Default: 45
-                SizeY = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Circle3 = {
-                SizeX = 45; --Default: 45
-                SizeY = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Circle4 = {
-                SizeX = 45; --Default: 45
-                SizeY = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Circle5 = {
-                SizeX = 45; --Default: 45
-                SizeY = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Circle6 = {
-                SizeX = 45; --Default: 45
-                SizeY = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Tilt1 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Tilt2 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Tilt3 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Tilt4 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Tilt5 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Tilt6 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Zoom1 = {
-                Size = 45; --Default: 45
-                Speed = 3; --Default: 3
-            };
-            
-            Color1 = {
-                Speed = 3; --Default: 3
-            };
-            
-            Color2 = {
-                Speed = 3; --Default: 3
-            };
-            
-            Color3 = {
-                Speed = 3; --Default: 3
-            };
-        }
+    effects = {
+        sin = {
+            speed = {min=0,max=10,default=3},
+            phase = {min=0,max=360,default=45},
+            fx = {
+                pan = {enabled=false,phase=-90,size=45},
+                tilt = {enabled=false,phase=0,size=45},
+                dim = {enabled=false,phase=0,size=255},
+                zoom = {enabled=false,phase=0,size=255},
+            }
+        },
+        rampUp = {
+            speed = {min=0,max=10,default=3},
+            phase = {min=0,max=360,default=22.5},
+            fx = {
+                dim = {enabled=false,phase=0,size=255},
+                color = {enabled=false,phase=0,size=255},
+                pan = {enabled=false,phase=0,size=45},
+                tilt = {enabled=false,phase=0,size=45},
+            }
+        },
+        rampDown = {
+            speed = {min=0,max=10,default=3},
+            phase = {min=0,max=360,default=22.5},
+            fx = {
+                dim = {enabled=false,phase=0,size=255},
+                color = {enabled=false,phase=0,size=255},
+                pan = {enabled=false,phase=0,size=45},
+                tilt = {enabled=false,phase=0,size=45},
+            }
+        },
     };
 
     Groups = {
@@ -145,6 +93,8 @@ local CPS = {
 
     updaters = {}
 }
+
+local effectRunner = require(script.Parent.EffectEngine)
 
 --Functions
 
@@ -165,15 +115,15 @@ end
 
 function CPS:UpdateEffect(i, ii, bool)
     self.FX[i][ii].enabled = bool
-    self.Effects[i][ii].Disabled = reverse(bool);
+    self.Effects[i][ii].Disabled = reverse(bool)
 end
 
 function CPS:ChangeEffectSpeed(index1, index2, spd)
-    if not self.Effects[index1][index2].enabled 
+    
 end
 
 function CPS:UpdateFixtures(group, attribute, value)
-    if self.Settings.FixturesUpdating then
+    if self.settings.fixturesUpdating then
         local att = self.Attributes[attribute]
 
         self.updaters[group](att, value)
@@ -196,40 +146,37 @@ function CPS:GetFixtures()
 end
 
 function CPS:init()
-    local clamp = function(x, y, z)
-        return x >= z and z or x <= y and y or x
-    end
+    local util = {
+        clamp = function(x, y, z)
+            return x >= z and z or x <= y and y or x
+        end,
 
-    local split = function(s, x, y)
-        return s:sub(1, x), s:sub(y, s:len())
-    end
-
-    for _, v in pairs(self:GetFixtures()) do
-        if self.Settings.FixturesEnabled then
-            v.Control.Disabled = false
-            if self.Settings.FixturesUpdating then
-                for attribute, tbl in pairs(self.Attributes) do
-                    local value, args = clamp(tbl.default, tbl.min, tbl.max)
-                    
-                    self:UpdateFixtures("All", attribute, value)
+        split = function(s, x, y)
+            return s:sub(1, x), s:sub(y, s:len())
+        end,
+        
+        find = function(tbl, value)
+            for k, v in pairs(tbl) do
+                if v == value then
+                    return v
                 end
             end
-        end
-    end
+        end,
+    }
+    
+    --start updaters
 
     self.updaters["All"] = function(att, value)
         for _, v in pairs(self:GetFixtures()) do
-            v.Control[att.main].Value = clamp(value, att.min, att.max)
+            v.Control[att.main].Value = util.clamp(value, att.min, att.max)
         end
     end
     
-
     for _, v in pairs(self.groups) do
         if string.match(v, "G") then
             self.updaters[v] = function(att, value)
-                local s1, s2 = split(group, 1, 2)
-                local GR1, GR2 = group, concat(s1, "R", s2))
-
+                local s1, s2 = util.split(group, 1, 2)
+                local GR1, GR2 = group, concat(s1, "R", s2)
                 local Value = clamp(value, att.min, att.max)
 
                 for _, v in pairs(self.Fixtures[GR1]:GetChildren()) do
@@ -238,6 +185,40 @@ function CPS:init()
 
                 for _, v in pairs(self.Fixtures[GR2]:GetChildren()) do
                     v.Control[attribute].Value = Value
+                end
+            end
+        end
+    end
+
+    --reset fixtures to default
+    
+    for _, v in pairs(self.Fixtures:GetFixtures()) do
+        if self.settings.fixturesEnabled then
+            v.Control.Disabled = false
+            if self.Settings.FixturesUpdating then
+                for attribute, tbl in pairs(self.Attributes) do
+                    local value, args = util.clamp(tbl.default, tbl.min, tbl.max)
+                    
+                    self:UpdateFixtures("All", attribute, value)
+                end
+            end
+        end
+    end
+    
+    --init effects
+    
+    for name, group in pairs(self.effects) do
+        group.speed.value = util.clamp(group.speed.default, group.speed.min, group.speed.max)
+        group.phase.value = util.clamp(group.phase.default, group.phase.min, group.phase.max)
+        for _, effect in pairs(v.fx) do
+            if not self.settings.effectsEnabled then
+                effect.enabled = false
+            else
+                effect.x = 0
+                if effect.enabled then
+                    local run, pause = effectRunner()
+                    
+                    run("CLPakyScenius", name, effect)
                 end
             end
         end
