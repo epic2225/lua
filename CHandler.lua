@@ -109,18 +109,7 @@ local reverse = function(bool)
     })[bool]
 end
 
-function CPS:FindEffect(effectIndex, subIndex)
-    return self:FindEffect(effectIndex)[subIndex]
-end
 
-function CPS:UpdateEffect(i, ii, bool)
-    self.FX[i][ii].enabled = bool
-    self.Effects[i][ii].Disabled = reverse(bool)
-end
-
-function CPS:ChangeEffectSpeed(index1, index2, spd)
-    
-end
 
 function CPS:UpdateFixtures(group, attribute, value)
     if self.settings.fixturesUpdating then
@@ -210,15 +199,25 @@ function CPS:init()
     for name, group in pairs(self.effects) do
         group.speed.value = util.clamp(group.speed.default, group.speed.min, group.speed.max)
         group.phase.value = util.clamp(group.phase.default, group.phase.min, group.phase.max)
-        for _, effect in pairs(v.fx) do
+        for k, effect in pairs(v.fx) do
             if not self.settings.effectsEnabled then
                 effect.enabled = false
             else
                 effect.x = 0
-                if effect.enabled then
-                    local run, pause = effectRunner()
-                    
-                    run("CLPakyScenius", name, effect)
+                if self.settings.effectsRunning then
+                    if effect.enabled then
+                        local run, pause, effects = effectRunner()
+                        
+                        run("CLPakyScenius", name, effect)
+                    end
+                else
+                    if effect.enabled then
+                        local run, pause, effects = effectRunner()
+                        
+                        if effects.running[k] == effect then
+                            pause(effect)
+                        end
+                    end
                 end
             end
         end
