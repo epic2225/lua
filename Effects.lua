@@ -19,7 +19,7 @@ local waveforms = {
     end,
 }
 
-function effectEngine:runEffect(fixture, waveform, id, effect)
+function runEffect(fixture, waveform, id, effect)
     if effects.running[id] then
         effects.running[id] = nil
     end
@@ -66,7 +66,5 @@ end
 
 
 return function()
-    if not effectEngine.started then
-        effectEngine:init()
-    end
+    return runEffect, pauseEffect, effects, effectEngine
 end
