@@ -59,6 +59,7 @@ local CPS = {
                 zoom = {enabled=false,phase=0,size=255},
             }
         },
+        
         rampUp = {
             speed = {min=0,max=10,default=3},
             phase = {min=0,max=360,default=22.5},
@@ -69,6 +70,7 @@ local CPS = {
                 tilt = {enabled=false,phase=0,size=45},
             }
         },
+        
         rampDown = {
             speed = {min=0,max=10,default=3},
             phase = {min=0,max=360,default=22.5},
@@ -96,18 +98,13 @@ local CPS = {
 }
 
 local effectRunner = require(script.Parent.EffectEngine)
-
---Functions
-
 local debugMode = false
 
+--Functions
 local dPrint = function(...) if (debugMode) then print(...) end end
 
 local reverse = function(bool)
-    return ({
-        [true] = false;
-        [false] = true;
-    })[bool]
+    return ({[true] = false;[false] = true})[bool]
 end
 
 
