@@ -76,7 +76,7 @@ function visualSystem.gifs:startGif(settings)
 						f:GetChildren()[x - 1].Visible = false
 					end
 					if ii == #f:GetChildren() then
-						f:GetChildren()[60].Visible = false
+						f:GetChildren()[#f:GetChildren()].Visible = false
 					end
 					f:GetChildren()[x].Visible = true
 				end
