@@ -19,9 +19,9 @@ local httpService = game:GetService("HttpService")
 local runService = game:GetService("RunService")
 
 function visualSystem:mapVisuals(screen, center)
-    local d = screen.CFrame.Position - center.CFrame.Position
-    for _, v in pairs(screen.g.UI:GetChildren()) do
-        if v:IsA("ImageLabel" or "Frame" or "TextLabel") then
+	local d = screen.CFrame.Position - center.CFrame.Position
+	for _, v in pairs(screen.g.UI:GetChildren()) do
+		if v:IsA("ImageLabel" or "Frame" or "TextLabel") then
 			v.Position = UDim2.new(0.5, -(d.X * self.const), 0.5, d.Y * self.const)
 		elseif v:IsA("Folder") and string.match(v.Name, "GIF") then
 			for _, frame in pairs(v:GetChildren()) do
@@ -30,8 +30,8 @@ function visualSystem:mapVisuals(screen, center)
 				end
 			end
 		end
-    end
-    screen.g.CanvasSize = Vector2.new(screen.Size.X * self.const, screen.Size.Y * self.const)
+	end
+	screen.g.CanvasSize = Vector2.new(screen.Size.X * self.const, screen.Size.Y * self.const)
 end
 
 function visualSystem:getPanels()
