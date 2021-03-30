@@ -88,7 +88,7 @@ function visualSystem.gifs:startGif(settings)
 end
 
 function visualSystem:init()
-    local range = #self.screens
+	local range = #self.screens
 	if range <= self.maxScreens then
 		for i = 1, range do
 			self.panels[i] = self.screens[i]
