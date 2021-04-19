@@ -1,9 +1,9 @@
 local function clamp(x, min, max)
-	return x >= max and max or x <= min and min or x
+    return x >= max and max or x <= min and min or x
 end
 
 local function lerp(a, b, t)
-	return a * (1 - t) + b * t
+    return a * (1 - t) + b * t
 end
 
 return function(h, sat, val)
