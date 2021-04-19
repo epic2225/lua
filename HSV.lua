@@ -1,3 +1,11 @@
+local function clamp(x, min, max)
+	return x >= max and max or x <= min and min or x
+end
+
+local function lerp(a, b, t)
+	return a * (1 - t) + b * t
+end
+
 return function(h, sat, val)
     local v = (h % 360)
 	
@@ -29,28 +37,21 @@ return function(h, sat, val)
     local red = math.floor((r + r2) * 255)
     local green = math.floor((g + g2) * 255) - 255
     local blue = math.floor((b + b2) * 255) - 255
-    
-    local function mix(s, v, r, g, b)
-        local clamp = function(x, y, z) if x < y then return y elseif x > z then return z else return x end end
-        local lerp = function(...) local args = {...} return args[1] * (1 - args[3]) + args[2] * args[3] end
         
-        local S = clamp(s, 0, 255) / 255
-        local V = clamp(v, 0, 255) / 255
+    local S = clamp(sat, 0, 255) / 255
+    local V = clamp(val, 0, 255) / 255
         
-        local R = clamp(r, 0, 255)
-        local G = clamp(g, 0, 255)
-        local B = clamp(b, 0, 255)
+    local R = clamp(red, 0, 255)
+    local G = clamp(green, 0, 255)
+    local B = clamp(blue, 0, 255)
         
-        local sat_R = (lerp(R, 255, 1 - S))
-        local sat_G = (lerp(G, 255, 1 - S))
-        local sat_B = (lerp(B, 255, 1 - S))
+    local sat_R = (lerp(R, 255, 1 - S))
+    local sat_G = (lerp(G, 255, 1 - S))
+    local sat_B = (lerp(B, 255, 1 - S))
         
-        local val_R = (lerp(sat_R, 0, 1 - V))
-        local val_G = (lerp(sat_G, 0, 1 - V))
-        local val_B = (lerp(sat_B, 0, 1 - V))
+    local val_R = (lerp(sat_R, 0, 1 - V))
+    local val_G = (lerp(sat_G, 0, 1 - V))
+    local val_B = (lerp(sat_B, 0, 1 - V))
         
-        return math.floor(val_R), math.floor(val_G), math.floor(val_B)
-    end
-    
-    return mix(sat, val, red, green, blue)
+    return math.floor(val_R), math.floor(val_G), math.floor(val_B)
 end
