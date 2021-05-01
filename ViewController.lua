@@ -208,23 +208,23 @@ function __viewController:Start()
 						(math.floor((x - self.highlighter.pos[1]) / self.snapSize[1]) * self.snapSize[1]),
 						(math.floor((y - self.highlighter.pos[2]) / self.snapSize[2]) * self.snapSize[2]),
 					}
-						--[[
-						local colors = {
-							Color3.fromRGB(0,209,255),
-							Color3.fromRGB(255,127,0),
-						}
+					
+					local colors = {
+						Color3.fromRGB(0,209,255),
+						Color3.fromRGB(255,127,0),
+					}
 						
-						for x = self.position[1], 1100, 100 do
-							for y = self.position[2], 700, 100 do
-								local map = self.map[x][y]
+					for x = self.position[1], 1100, 100 do
+						for y = self.position[2], 700, 100 do
+							local map = self.map[x][y]
 								
-								if x >= (self.size[1]+self.position[1]) + 100 and y >= (self.size[2]+self.position[2]) + 100 then
-									map.BackgroundColor3 = colors[1]
-								else
-									map.BackgroundColor3 = colors[2]
-								end
+							if x >= (self.size[1]+self.position[1]) + 100 and y >= (self.size[2]+self.position[2]) + 100 then
+								map.BackgroundColor3 = colors[1]
+							else
+								map.BackgroundColor3 = colors[2]
 							end
-						end]]
+						end
+					end
 				end
 			end))
 			
@@ -247,13 +247,15 @@ function __viewController:Start()
 				self.dots.fadeOut()
 			end))
 			
-			self.newConnection(#self.connections + 1, selectorButtons.Clock.MouseButton1Down:Connect(function()
-				self:select("Clock", self.size, self.position)
-			end))
-			
-			self.newConnection(#self.connections + 1, selectorButtons.Note.MouseButton1Down:Connect(function()
-				self:select("Note", self.size, self.position)
-			end))
+			for _, v in pairs(selectorButtons:GetChildren()) do
+				if v:IsA("TextButton") then
+					if views[v.Name] then
+						self.newConnection(#self.connections + 1, selectorButtons.Clock.MouseButton1Down:Connect(function()
+							self:select(v.Name, self.size, self.position)
+						end)
+					end
+				end
+			end
 		end
 		
 		if self.selector.isVisible or self.highlighter.isVisible then
@@ -279,12 +281,9 @@ function ViewController.getScreenById(ID)
 	return screens[ID]
 end
 
-function ViewController.getScreenByNameAndId(name, ID)
-	local screen = screens[ID]
-	
-	if screen.settings.name == name then
-		return screen
-	end
+function ViewController.getScreenByName(name)
+	for _, v in pairs(screens) do
+		
 end
 
 function ViewController:Start()
