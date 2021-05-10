@@ -35,14 +35,13 @@ function ViewController.new(name, ID, scr)
 	
 	self.map = {}
 	
-	--[[
 	for x = 0, 1100, self.snapSize[1] do
 		self.map[x] = {}
 		
 		for y = 0, 700, self.snapSize[2] do
 			self.map[x][y] = self.getDotByPos({x+22,y+20})
 		end
-	end]]
+	end
 	
 	self.gui = {
 		viewFrames = {},
